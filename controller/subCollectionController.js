@@ -4,11 +4,13 @@ const collection = require("../model/collection.js");
 const subCollectionController = {
   getAllSubCollections: async (req, res) => {
     try {
-      const { collectionId } = req.query;
+      const { collectionName } = req.query;
 
-      if (collectionId) {
+      if (collectionName) {
         // If collectionId is provided, fetch sub-collections by that collectionId
-        const subCollections = await subCollection.find({ collectionId });
+        const subCollections = await subCollection.find({
+          collectionName: collectionName,
+        });
         if (subCollections.length === 0) {
           return res.status(404).json({
             message: "No sub-collections found for the provided collectionId",
@@ -21,7 +23,7 @@ const subCollectionController = {
         if (allSubCollections.length === 0) {
           return res.status(404).json({ message: "No sub-collections found" });
         }
-        res.status(200).json(allSubCollections);
+        res.status(200).json({ message: "success", data: allSubCollections });
       }
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -80,6 +82,10 @@ const subCollectionController = {
 
       const formattedSubCollections = subCollections.docs.map((sub) => {
         const formattedSub = sub.toObject();
+        if (formattedSub._id) {
+          formattedSub.id = formattedSub._id.toString(); // Convert ObjectId to string for id field
+          delete formattedSub._id; // Remove the _id field
+        }
         formattedSub.collectionId = formattedSub.collectionId
           ? formattedSub.collectionId._id.toString()
           : null;
