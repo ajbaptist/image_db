@@ -19,26 +19,23 @@ const subCollectionController = {
         if (!responseData[subCol.collectionName]) {
           responseData[subCol.collectionName] = {
             collectionName: subCol.collectionName,
-            data: []
+            subData: [] // Changed field name from data to subData
           };
         }
-        responseData[subCol.collectionName].data.push(subCol);
+        responseData[subCol.collectionName].subData.push(subCol); // Changed field name from data to subData
       });
   
       // Include an "All" collection containing all data
-      const allData = allSubCollections.map(subCol => ({
-        collectionName: "All",
-        data: subCol
-      }));
+      const allData = allSubCollections.map(subCol => subCol); // Directly include the items
   
       // Merge the "All" collection with existing data
       if (!responseData["All"]) {
         responseData["All"] = {
           collectionName: "All",
-          data: []
+          subData: [] // Changed field name from data to subData
         };
       }
-      responseData["All"].data = allData;
+      responseData["All"].subData = allData; // Changed field name from data to subData
   
       const finalData = Object.values(responseData);
   
@@ -56,6 +53,7 @@ const subCollectionController = {
       res.status(500).json({ message: err.message });
     }
   },
+  
   
 
   createSubCollection: async (req, res) => {
