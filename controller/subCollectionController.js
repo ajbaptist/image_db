@@ -62,20 +62,15 @@ const subCollectionController = {
         query = { collectionName: { $regex: regexPattern } };
       }
 
-      const regexPattern = new RegExp(`^${collectionName}`, "i"); // Creating a regex pattern to match names starting with the provided collectionName
-
-      const subCollections = await subCollection.paginate(
-       query,
-        {
-          page: parseInt(page, 10),
-          limit: parseInt(limit, 10),
-          select: "-__v",
-          populate: {
-            path: "collectionId",
-            select: "_id",
-          },
-        }
-      );
+      const subCollections = await subCollection.paginate(query, {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+        select: "-__v",
+        populate: {
+          path: "collectionId",
+          select: "_id",
+        },
+      });
 
       if (!subCollections || subCollections.docs.length === 0) {
         return res
