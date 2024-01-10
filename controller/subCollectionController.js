@@ -2,33 +2,61 @@ const subCollection = require("../model/SubCollection.js");
 const collection = require("../model/collection.js");
 
 const subCollectionController = {
+   
+
   getAllSubCollections: async (req, res) => {
     try {
-      const { collectionName } = req.query;
-
-      if (collectionName) {
-        // If collectionId is provided, fetch sub-collections by that collectionId
-        const subCollections = await subCollection.find({
-          collectionName: collectionName,
-        });
-        if (subCollections.length === 0) {
-          return res.status(404).json({
-            message: "No sub-collections found for the provided collectionId",
-          });
-        }
-        res.status(200).json({ message: "success", data: subCollections });
-      } else {
-        // If collectionId is not provided, fetch all sub-collections
-        const allSubCollections = await subCollection.find();
-        if (allSubCollections.length === 0) {
-          return res.status(404).json({ message: "No sub-collections found" });
-        }
-        res.status(200).json({ message: "success", data: allSubCollections });
+      const allSubCollections = await subCollection.find();
+  
+      if (allSubCollections.length === 0) {
+        return res.status(404).json({ message: "No sub-collections found" });
       }
+  
+      let responseData = {};
+  
+      // Organize data by collectionName
+      allSubCollections.forEach(subCol => {
+        if (!responseData[subCol.collectionName]) {
+          responseData[subCol.collectionName] = {
+            collectionName: subCol.collectionName,
+            data: []
+          };
+        }
+        responseData[subCol.collectionName].data.push(subCol);
+      });
+  
+      // Include an "All" collection containing all data
+      const allData = allSubCollections.map(subCol => ({
+        collectionName: "All",
+        data: subCol
+      }));
+  
+      // Merge the "All" collection with existing data
+      if (!responseData["All"]) {
+        responseData["All"] = {
+          collectionName: "All",
+          data: []
+        };
+      }
+      responseData["All"].data = allData;
+  
+      const finalData = Object.values(responseData);
+  
+      // Move "All" collection to the beginning of the list
+      const allCollectionIndex = finalData.findIndex(
+        entry => entry.collectionName === "All"
+      );
+      if (allCollectionIndex !== -1) {
+        const allCollection = finalData.splice(allCollectionIndex, 1)[0];
+        finalData.unshift(allCollection);
+      }
+  
+      res.status(200).json({ message: "success", data: finalData });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
   },
+  
 
   createSubCollection: async (req, res) => {
     try {
