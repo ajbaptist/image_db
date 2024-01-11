@@ -119,10 +119,8 @@ const subCollectionController = {
       });
 
       res.status(200).json({
-        currentPage: subCollections.page,
-        totalPages: subCollections.totalPages,
-        totalItems: subCollections.totalDocs,
-        perPage: subCollections.limit,
+     
+
         subCollections: formattedSubCollections,
       });
     } catch (err) {
